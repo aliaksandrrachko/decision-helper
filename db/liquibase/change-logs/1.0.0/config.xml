@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <!-- Postgres can represent big integer up to 1000 significat digits. Oracle max is 38. For integer types with unpredictable max values -->
+    <!-- use numeric(1000) in PostgreSQL and varchar(1000) in Oracle. In Java part the corresponding type in both cases will be BigInteger. -->
+    <property name="VeryBigIntegerType" value="numeric(1000)" dbms="postgresql"/>
+    <property name="VeryBigIntegerType" value="varchar(1000)" dbms="oracle"/>
+
+    <!-- Max significant digits for oracle numeric fields is 38. Use it for integer types with unpredictable max values but not bigger than 38. -->
+    <property name="BigIntegerType" value="numeric(38)"/>
+
+    <property name="LongVarcharType" value="varchar" dbms="postgresql"/>
+    <property name="LongVarcharType" value="varchar(4000)" dbms="oracle"/>
+
+</databaseChangeLog>

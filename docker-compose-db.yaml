@@ -1,0 +1,44 @@
+---
+version: '3.2'
+
+services:
+# docker-compose --profile db up
+
+  decision_helper_postgres:
+    profiles: [ "db" ]
+    container_name: decision_helper_postgres
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_DB: ${DB_DATABASE}
+    ports:
+      - "5432:5432"
+    volumes:
+      - decision_helper_postgres:/var/lib/postgresql
+      - ./db/init/create-tablespace.sh:/docker-entrypoint-initdb.d/create-tablespace.sh
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "${DB_DATABASE}", "-U", "${DB_USERNAME}" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+
+  decision_helper_liquibase_schema:
+    profiles: [ "liquibase-schema" ]
+    command: [
+      "--url=jdbc:postgresql://decision_helper_postgres/${DB_DATABASE}",
+      "--changeLogFile=cumulative.xml",
+      "--username=${DB_USERNAME}",
+      "--password=${DB_PASSWORD}",
+      "--log-level=debug",
+      "update",
+      ]
+    container_name: decision_helper_liquibase_schema
+    image: liquibase/liquibase
+    volumes:
+      - ./db/liquibase:/liquibase/changelog
+
+volumes:
+  decision_helper_postgres:
+...

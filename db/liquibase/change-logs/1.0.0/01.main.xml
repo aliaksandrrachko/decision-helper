@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <include file="config.xml" relativeToChangelogFile="true"/>
+
+    <!--tables-->
+    <changeSet author="${author}" id="decision-helper-v.1.0.0-decision">
+        <createTable tablespace="${tablespace-data}" tableName="decision">
+            <column name="dec_id" type="numeric(10)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="dec_pk" primaryKeyTablespace="${tablespace-index}"/>
+            </column>
+            <column name="title" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="session_user" name="navi_user" type="varchar(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="CURRENT_TIMESTAMP" name="navi_date" type="timestamp(0) with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="del_user" type="varchar(30)"/>
+            <column name="del_date" type="timestamp(0) with time zone"/>
+        </createTable>
+        <sql dbms="postgresql">
+            ALTER TABLE decision ADD CONSTRAINT dec_title_ck CHECK (title != '')
+        </sql>
+        <sql dbms="postgresql">
+            ALTER TABLE decision ADD CONSTRAINT dec_user_ck CHECK (navi_user != '')
+        </sql>
+        <rollback>
+            <dropTable tableName="decision"/>
+        </rollback>
+    </changeSet>
+    <changeSet author="${author}" id="decision-helper-v.1.0.0-dec_seq">
+        <createSequence sequenceName="dec_seq" minValue="1" maxValue="9999999999" incrementBy="1" cycle="false"/>
+    </changeSet>
+    <changeSet author="${author}" id="decision-helper-v.1.0.0-dec_title_ui">
+        <createIndex indexName="dec_title_ui" tableName="decision" unique="true" tablespace="${tablespace-index}">
+            <column name="title"/>
+            <column name="coalesce(del_date,'infinity')"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="${author}" id="decision-helper-v.1.0.0-decision_remarks" labels="i18n">
+        <setTableRemarks tableName="decision" remarks="Decisions table"/>
+        <setColumnRemarks tableName="decision" columnName="dec_id" remarks="Primary key"/>
+        <setColumnRemarks tableName="decision" columnName="title" remarks="Title"/>
+        <setColumnRemarks tableName="decision" columnName="navi_user" remarks="Create or update user"/>
+        <setColumnRemarks tableName="decision" columnName="navi_date" remarks="Create or update date"/>
+        <setColumnRemarks tableName="decision" columnName="del_user" remarks="Delete user"/>
+        <setColumnRemarks tableName="decision" columnName="del_date" remarks="Delete date"/>
+        <rollback/>
+    </changeSet>
+
+</databaseChangeLog>

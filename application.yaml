@@ -1,0 +1,7 @@
+datasource:
+    url: postgresql://decision_helper:decision_helper@localhost:5432/decision_helper?application_name=decision-helper&sslmode=disable
+    driver-name: pgx
+server:
+    host: localhost
+    port: 8080
+    trusted-proxies: ["localhost", "127.0.0.1"]
