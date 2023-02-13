@@ -16,6 +16,10 @@ jobs:
     env:
       working-directory: ./webapp
       
+    defaults:
+      run:
+        working-directory: ${{ env.working-directory }}
+      
     steps:
     - uses: actions/checkout@v3
 
@@ -26,11 +30,9 @@ jobs:
 
     - name: Build
       run: go build -v ./...
-      working-directory: ${{env.working-directory}}
 
     - name: Test
       run: go test -v ./... -json > test-results.json
-      working-directory: ${{env.working-directory}}
       
     - name: Upload test results
       uses: actions/upload-artifact@v3
