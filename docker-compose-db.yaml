@@ -4,6 +4,17 @@ version: '3.2'
 services:
 # docker-compose --profile db up
 
+  decision_helper_app:
+    profiles: ["app"]
+    container_name: decision_helper_app
+    build: ./webapp
+    restart: always
+    environment:
+      APPLICATION_CONFIG_PATH: ./application.yaml
+      DATASOURCE_URL: postgresql://${DB_USERNAME}:${DB_PASSWORD}@decision_helper_postgres:5432/${DB_DATABASE}?application_name=decision-helper&sslmode=disable
+    ports:
+      - 8080:8080
+
   decision_helper_postgres:
     profiles: [ "db" ]
     container_name: decision_helper_postgres

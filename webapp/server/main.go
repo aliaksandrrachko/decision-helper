@@ -87,10 +87,21 @@ func ValidateConfigPath(path string) error {
 	return nil
 }
 
+const (
+	APPLICATION_CONFIG_PATH_ENV  = "APPLICATION_CONFIG_PATH"
+	DefaultApplicationConfigPath = "./../application.yaml"
+)
+
 func ParseFlags() (string, error) {
-	var configPath string
-	flag.StringVar(&configPath, "application", "../application.yaml", "path to config file")
+	configPath := os.Getenv(APPLICATION_CONFIG_PATH_ENV)
+
+	if configPath == "" {
+		flag.StringVar(&configPath, "application", DefaultApplicationConfigPath, "path to config file")
+	} else {
+		flag.StringVar(&configPath, "application", configPath, "path to config file")
+	}
 	flag.Parse()
+
 	if err := ValidateConfigPath(configPath); err != nil {
 		return "", err
 	}

@@ -6,6 +6,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const (
+	DATASOURCE_URL_ENV_NAME = "DATASOURCE_URL"
+)
+
 type Config struct {
 	DataSource struct {
 		Url        string `yaml:"url"`
@@ -32,6 +36,11 @@ func NewConfig(configPath string) (*Config, error) {
 
 	if err := decoder.Decode(&config); err != nil {
 		return nil, err
+	}
+
+	datasourceEnv := os.Getenv(DATASOURCE_URL_ENV_NAME)
+	if datasourceEnv != "" {
+		config.DataSource.Url = datasourceEnv
 	}
 
 	return config, nil
